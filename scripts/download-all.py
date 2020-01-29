@@ -140,25 +140,14 @@ def download_zipped_docs(version: str):
 
     _, repo_root = get_bearings()
 
-    target_location = Path(repo_root, f"archive/{version}").resolve()
-    os.makedirs(target_location, exist_ok=True)
-    if len(os.listdir(target_location)) != 0:
-        return os.listdir(target_location)
-
-    cache_location = Path(repo_root, f".cache/downloads/{version}/archive.zip")
-    if os.path.exists(cache_location):
-        with open(cache_location, "rb") as cache:
-            data = cache.read()
+    target_location = Path(repo_root, f"archive/{version}.zip").resolve()
+    if os.path.exists(target_location):
+        return
     else:
-        data = download(version, cache_location)
-    z = ZipFile(BytesIO(data))
-    n = z.namelist()  # List[str]
-    for name in z.namelist():
-        filename = name.split("/", 1)[1]
-        z.extract(name, Path(target_location, filename))
-    return os.listdir(target_location)
+        download(version, target_location)
 
 
 if __name__ == "__main__":
     for version in all_versions:
+        print(f"processing {version}")
         download_zipped_docs(version)
